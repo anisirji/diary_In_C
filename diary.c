@@ -28,7 +28,7 @@ void main(){
     FILE *diary;
     while(30){
         char c = getch();
-        printf("%d",c);
+        // printf("%d",c);
 
         switch (c)
         {
@@ -36,17 +36,22 @@ void main(){
             cls();
             line();
             printf("%*s",width/2,"* * * * Add Task * * * *\n\n");
-            printf("(Press esc to exit)\n(Enter to save)\n");
+            printf("(Press esc to exit)\n(Enter to save)\n\n");
+            time_t t = time(NULL);
+            struct tm tm = *localtime(&t); 
+            diary = fopen("my_diary.txt","a");
+            fprintf(diary, "\n\n(%02d-%02d-%d)", tm.tm_mday,tm.tm_mon + 1,tm.tm_year + 1900);
+            fclose(diary);
             while(getch() != 27){
                 char task[100];
                 printf("Enter Task: ");
                 scanf(" %[^\n]",&task);
                 diary = fopen("my_diary.txt","a");
-                fprintf(diary,"\n%s",task);
+                fprintf(diary,"\n@) %s.",task);
                 fclose(diary);
                 printf("added\n");
             }
-            printf("closed\n(click a to re-start)\n(click esc to exit)");
+            printf("\n\nclosed\n(click a to re-start)\n(click esc to exit)");
 
             break;
         
@@ -60,6 +65,20 @@ void main(){
             cls();
             line();
             printf("%*s",width/2,"* * * * My Tasks * * * *\n\n");
+            printf("(Press esc to exit)\n(Enter to view todo)\n\n");
+
+            for(int i = 0 ; getch() != 27; i++){
+                if(i == 1) break;
+                diary = fopen("my_diary.txt","r");
+                char c = fgetc(diary);
+                while(c != EOF){
+                    printf("%c",c);
+                    c = fgetc(diary);
+                    delay(1);
+                }
+                fclose(diary);
+                printf("\n\nPress Esc to exit");
+            }
             break;
 
         case 114:
@@ -71,7 +90,7 @@ void main(){
             exit(1);
 
         default:
-            printf("Invalid Input");
+            printf("Invalid Input\n");
         }
         
     }
@@ -84,21 +103,14 @@ void cls(){
 }
 
 //this function to assigning location to text
-
 void gotoxy(int x,int y){
 printf("%c[%d;%df",0x1B,y,x);
 }
 
-//This function creates line
-void delay(int number_of_seconds)
-{
-    // Converting time into milli_seconds
+//This function delays the program
+void delay(int number_of_seconds){
     int milli_seconds = 70 * number_of_seconds;
-  
-    // Storing start time
     clock_t start_time = clock();
-  
-    // looping till required time is not achieved
     while (clock() < start_time + milli_seconds);
 }
 
@@ -131,5 +143,6 @@ void start(){
     printf("%*s\n",width,"* * * * *  Welcome To Mydiary  * * * * *\n\n");
     printf("%s","Enter \"r\" for reset or create new file\n");
     printf("%s","Enter \"a\" for Add Todo\n");
-    printf("%s","Enter \"b\" for View Todo\n");
+    printf("%s","Enter \"b\" for View Todo\n\n\n");
+    printf("%s","Enter \"0\" to exit\n");
 }
